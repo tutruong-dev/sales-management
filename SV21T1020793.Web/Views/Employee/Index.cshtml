@@ -51,7 +51,7 @@
                         <div class="box-body">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <img class="profile-user-img img-responsive img-bordered" src="~/images/employees/@item.Photo">
+                                    <img class="profile-user-img img-responsive img-bordered" src="~/images/employees/@(string.IsNullOrWhiteSpace(item.Photo) ? "nophoto.png" : item.Photo)" />
                                 </div>
                                 <div class="col-sm-8">
                                     <ul class="list-group list-group-unbordered">

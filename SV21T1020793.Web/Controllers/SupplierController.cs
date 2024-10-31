@@ -21,7 +21,7 @@ namespace SV21T1020793.Web.Controllers
             ViewBag.PageCount = pageCount;
             ViewBag.SearchValue = searchValue;
 
-            return View(data);      //List<Customer>        IEnumerable<Customer>
+            return View(data);      //List<Supplier>        IEnumerable<Supplier>
         }
         public IActionResult Create()
         {

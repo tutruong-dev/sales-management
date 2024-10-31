@@ -42,7 +42,7 @@ namespace SV21T1020793.DataLayers.SQLServer
         public int Count(string searchValue = "")
         {
             int count = 0;
-            searchValue = $"%{searchValue}";
+            searchValue = $"%{searchValue}%";
             using (var connection = OpenConnection())
             {
                 var sql = @"select count(*)
@@ -147,7 +147,7 @@ namespace SV21T1020793.DataLayers.SQLServer
             bool result = false;
             using (var connection = OpenConnection())
             {
-                var sql = @"@""if exists (select * from Customers where CustomerId <> @CustomerId and Email = @Email)
+                var sql = @"if exists (select * from Customers where CustomerId <> @CustomerId and Email = @Email)
                             begin   
                             update Customers
                             set    CustomerName = @CustomerName,
