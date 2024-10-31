@@ -29,4 +29,24 @@ namespace SV21T1020793.Web.Models
     {
         public required List<Customer> Data { get; set; }
     }
+
+    public class SupplierSearchResult : PaginationSearchResult
+    {
+        public required List<Supplier> Data { get; set; }
+    }
+
+    public class ShipperSearchResult : PaginationSearchResult
+    {
+        public required List<Shipper> Data { get; set; }
+    }
+
+    public class EmployeeSearchResult : PaginationSearchResult
+    {
+        public required List<Employee> Data { get; set; }
+    }
+
+    public class CategorySearchResult : PaginationSearchResult
+    {
+        public required List<Category> Data { get; set; }
+    }
 }
