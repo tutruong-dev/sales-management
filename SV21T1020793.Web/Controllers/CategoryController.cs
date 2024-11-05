@@ -59,27 +59,58 @@ namespace SV21T1020793.Web.Controllers
         }
         public IActionResult Save(Category data)
         {
-            //TODO: Kiểm tra dữ liệu đầu vào
+            ViewBag.Title = data.CategoryId == 0 ? "Bổ sung loại hàng mới" : "Cập nhật thông tin loại hàng";
 
-            if (data.CategoryId == 0)
+            // Kiểm tra nếu dữ liệu đầu vào không hợp lệ thì tạo ra một thông báo lỗi và lưu trữ vào ModelState
+            if (string.IsNullOrWhiteSpace(data.CategoryName))
+                ModelState.AddModelError(nameof(data.CategoryName), "Tên loại hàng không được để trống");
+            if (string.IsNullOrWhiteSpace(data.Description))
+                ModelState.AddModelError(nameof(data.Description), "Mô tả không được để trống");
+
+            //Dựa vào thuộc tính IsValid của ModelState để biết có tồn tại lỗi hay không?
+            if (ModelState.IsValid == false) // !ModelState.IsValid
             {
-                CommonDataService.AddCategory(data);
+                return View("Edit", data);
             }
-            else
+
+            try
             {
-                CommonDataService.UpdateCategory(data);
+                 if (data.CategoryId == 0)
+                {
+                    int id = CommonDataService.AddCategory(data);
+                    if (id <= 0)
+                    {
+                        ModelState.AddModelError(nameof(data.CategoryName), "Tên loại hàng bị trùng");
+                        return View("Edit", data);
+                    }
+                }
+                else
+                {
+                    bool result = CommonDataService.UpdateCategory(data);
+                    if (result == false)      // !result
+                    {
+                        ModelState.AddModelError(nameof(data.CategoryId), "Tên loại hàng bị trùng");
+                        return View("Edit", data);
+                    }
+                }
+                return RedirectToAction("Index");
+             }
+
+            catch
+            {
+                ModelState.AddModelError("Error", "Hệ thống tạm thời gián đoạn");
+                return View("Edit", data);
             }
-            return RedirectToAction("Index");
         }
-        public IActionResult Delete(int Id)
+        public IActionResult Delete(int id = 0)
         {
             ViewBag.Title = "Xóa thông tin loại hàng";
             if (Request.Method == "POST")
             {
-                CommonDataService.DeleteCategory(Id);
+                CommonDataService.DeleteCategory(id);
                 return RedirectToAction("Index");
             }
-            var data = CommonDataService.GetCategory(Id);
+            var data = CommonDataService.GetCategory(id);
             if (data == null)
                 return RedirectToAction("Index");
             return View(data);

@@ -147,17 +147,18 @@ namespace SV21T1020793.DataLayers.SQLServer
             bool result = false;
             using (var connection = OpenConnection())
             {
-                var sql = @"if exists (select * from Customers where CustomerId <> @CustomerId and Email = @Email)
+                var sql = @"if not exists (select * from Customers where CustomerId <> @CustomerId and Email = @Email)
                             begin   
-                            update Customers
-                            set    CustomerName = @CustomerName,
-                                   ContactName = @ContactName,
-	                               Province = @Province,
-	                               Address = @Address,
-	                               Phone = @Phone,
-	                               Email = @Email,
-	                               Islocked = @Islocked
-                            where CustomerId = @CustomerId";
+                                update  Customers
+                                set     CustomerName = @CustomerName,
+                                        ContactName = @ContactName,
+	                                    Province = @Province,
+	                                    Address = @Address,
+	                                    Phone = @Phone,
+	                                    Email = @Email,
+	                                    Islocked = @Islocked
+                                where CustomerId = @CustomerId
+                            end";
                 var parameters = new
                 {
                     CustomerId = data.CustomerID,

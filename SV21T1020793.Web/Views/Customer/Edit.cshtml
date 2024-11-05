@@ -13,7 +13,7 @@
                 <label>Tên khách hàng:</label>
                 <input type="text" class="form-control"
                        name="@nameof(Model.CustomerName)" value="@Model.CustomerName">
-                       @Html.ValidationMessage(nameof(Model.CustomerName))
+                @Html.ValidationMessage(nameof(Model.CustomerName))
             </div>
 
             <div class="form-group">

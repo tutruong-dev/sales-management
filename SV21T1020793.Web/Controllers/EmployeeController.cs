@@ -63,23 +63,49 @@ namespace SV21T1020793.Web.Controllers
         [HttpPost]
         public IActionResult Save(Employee data, string _BirthDate, IFormFile? _Photo)
         {
-            //TODO :Kiểm soát dữ liệu đầu vào
+            ViewBag.Title = data.EmployeeID == 0 ? "Bổ sung nhân viên mới" : "Cập nhật thông tin nhân viên";
 
-            //Xử lí cho ngày sinh
+            // Kiểm tra nếu dữ liệu đầu vào không hợp lệ thì tạo ra một thông báo lỗi và lưu trữ vào ModelState
+            if (string.IsNullOrWhiteSpace(data.FullName))
+                ModelState.AddModelError(nameof(data.FullName), "Họ tên nhân viên không được để trống");
+                ModelState.AddModelError(nameof(data.Address), "Vui lòng nhập địa chỉ của nhân viên");
+            if (string.IsNullOrWhiteSpace(data.Phone))
+                ModelState.AddModelError(nameof(data.Phone), "Vui lòng nhập sđt của nhân viên");
+            if (string.IsNullOrWhiteSpace(data.Email))
+                ModelState.AddModelError(nameof(data.Email), "Vui lòng nhập email của nhân viên");
+            // Kiểm tra ngày sinh
             DateTime? d = _BirthDate.ToDateTime();
-            if (d.HasValue) //(d !=null)
+            if (!d.HasValue)
+                ModelState.AddModelError(nameof(data.BirthDate), "Ngày sinh không hợp lệ");
+            else if (d.Value > DateTime.Today)
+                ModelState.AddModelError(nameof(data.BirthDate), "Ngày sinh không được lớn hơn ngày hiện tại");
+            else
                 data.BirthDate = d.Value;
 
-            //Xử lí với ảnh 
-            if (_Photo != null)
+            // Kiểm tra ảnh
+            if (_Photo == null)
             {
-                string fileName = $"{DateTime.Now.Ticks}-{_Photo.FileName}";
-                string filePath = Path.Combine(ApplicationContext.WebRootPath, @"images\employees", fileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                ModelState.AddModelError(nameof(data.Photo), "Vui lòng chọn ảnh của nhân viên");
+            }
+            else
+            {
+                // Kiểm tra định dạng ảnh
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                var extension = Path.GetExtension(_Photo.FileName).ToLower();
+                if (!allowedExtensions.Contains(extension))
                 {
-                    _Photo.CopyTo(stream);
+                    ModelState.AddModelError(nameof(data.Photo), "Định dạng ảnh không hợp lệ. Chỉ chấp nhận các định dạng: .jpg, .jpeg, .png");
                 }
-                data.Photo = fileName;
+                else if (ModelState.IsValid)
+                {
+                    string fileName = $"{DateTime.Now.Ticks}-{_Photo.FileName}";
+                    string filePath = Path.Combine(ApplicationContext.WebRootPath, @"images\employees", fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        _Photo.CopyTo(stream);
+                    }
+                    data.Photo = fileName;
+                }
             }
 
             if (data.EmployeeID == 0)
